@@ -12,8 +12,8 @@ class GeminiClient:
         if self.is_configured:
             # Configure the Google GenAI SDK
             genai.configure(api_key=self.api_key)
-            self.model_name = "gemini-2.5-pro"
-            logger.info("GeminiClient initialized successfully with gemini-2.5-pro.")
+            self.model_name = settings.GEMINI_MODEL_NAME
+            logger.info(f"GeminiClient initialized successfully with model '{self.model_name}'.")
         else:
             logger.warning("GeminiClient: GEMINI_API_KEY is missing. Gemini requests will fail.")
 
@@ -45,11 +45,11 @@ class GeminiClient:
         except Exception as err:
             logger.error(f"Gemini API generation error (using {self.model_name}): {err}")
             
-            # Fallback strategy: Try gemini-2.5-flash
-            if self.model_name != "gemini-2.5-flash":
+            # Fallback strategy: Try gemini-2.0-flash
+            if self.model_name != "gemini-2.0-flash":
                 try:
-                    logger.info("Attempting fallback to gemini-2.5-flash...")
-                    fallback_model = genai.GenerativeModel("gemini-2.5-flash")
+                    logger.info("Attempting fallback to gemini-2.0-flash...")
+                    fallback_model = genai.GenerativeModel("gemini-2.0-flash")
                     
                     response = await loop.run_in_executor(
                         None,

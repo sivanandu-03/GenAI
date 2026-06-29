@@ -23,6 +23,7 @@ class Settings:
     # API Keys and Models
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "gemini").lower()  # 'gemini' or 'lamini'
+    GEMINI_MODEL_NAME: str = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
     LAMINI_MODEL_NAME: str = os.getenv("LAMINI_MODEL_NAME", "MBZUAI/LaMini-Flan-T5-248M")
 
     # Paths

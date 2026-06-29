@@ -339,18 +339,35 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.detail || `Server returned code ${response.status}`);
+                let errMsg = `Server returned code ${response.status}`;
+                try {
+                    const errData = await response.json();
+                    errMsg = errData.detail || errMsg;
+                } catch (jsonErr) {
+                    // Fallback to text reading if response is HTML or empty
+                    try {
+                        const errText = await response.text();
+                        if (errText && errText.trim().length > 0 && errText.length < 200) {
+                            errMsg = errText.trim();
+                        }
+                    } catch (textErr) {}
+                }
+                throw new Error(errMsg);
             }
 
-            const data = await response.json();
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonErr) {
+                throw new Error("Received an invalid response format from the server.");
+            }
             
             // Format and display response
             renderResponseData(data);
             
         } catch (err) {
             loggerError(`API Failure on endpoint ${url}: ${err.message}`);
-            showAlert(`Failed to retrieve data: ${err.message}. Please verify settings or try again.`);
+            showAlert(`Failed to retrieve data: ${err.message}. Please check your API key quota, settings, or try again.`);
         } finally {
             // Unblock and hide loader
             loader.classList.add("hidden");
