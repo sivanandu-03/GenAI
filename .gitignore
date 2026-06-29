@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Secrets and environment configurations
+.env
+.env.local
+
+# Log files
+*.log
+logs/
+
+# Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# HuggingFace Cache (if stored in workspace)
+.cache/
+hf_models/

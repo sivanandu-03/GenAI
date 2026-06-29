@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGenie — AI Educational Assistant</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-container">
+                    <span class="magic-wand">🔮</span>
+                    <h1>EduGenie</h1>
+                </div>
+                <p class="tagline">Your Personal AI Tutor</p>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="qa">
+                    <i data-lucide="help-circle"></i>
+                    <span>Q&A Tutor</span>
+                </button>
+                <button class="nav-item" data-tab="explain">
+                    <i data-lucide="book-open"></i>
+                    <span>Concept Explainer</span>
+                </button>
+                <button class="nav-item" data-tab="quiz">
+                    <i data-lucide="check-square"></i>
+                    <span>Quiz Generator</span>
+                </button>
+                <button class="nav-item" data-tab="summarize">
+                    <i data-lucide="file-text"></i>
+                    <span>Note Summarizer</span>
+                </button>
+                <button class="nav-item" data-tab="recommend">
+                    <i data-lucide="compass"></i>
+                    <span>Study Roadmap</span>
+                </button>
+            </nav>
+
+            <!-- Configuration Card -->
+            <div class="config-card">
+                <div class="config-header">
+                    <i data-lucide="sliders"></i>
+                    <h3>Engine Preferences</h3>
+                </div>
+                <div class="form-group">
+                    <label for="model-select">AI Engine Provider</label>
+                    <select id="model-select" class="custom-select">
+                        <option value="gemini" selected>Google Gemini 1.5 Pro</option>
+                        <option value="lamini">LaMini Local (CPU)</option>
+                    </select>
+                </div>
+                <div class="fallback-note">
+                    <i data-lucide="shield-check"></i>
+                    <span>Automatic fallback enabled if engine fails.</span>
+                </div>
+            </div>
+
+            <!-- Footer status -->
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="backend-status">Checking connection...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <header class="workspace-header">
+                <div class="welcome-banner">
+                    <h2 id="tab-title">Q&A Tutor</h2>
+                    <p id="tab-description">Ask any educational question and receive deep, explanatory responses with real-world examples.</p>
+                </div>
+            </header>
+
+            <section class="workspace-body">
+                <!-- Input Panel -->
+                <div class="glass-card input-panel">
+                    <form id="assistant-form">
+                        <!-- Dynamic inputs container -->
+                        <div id="dynamic-inputs">
+                            <!-- Q&A Fields (Default) -->
+                            <div class="form-view active" id-view="qa">
+                                <div class="form-group">
+                                    <label for="qa-question">What is your question?</label>
+                                    <textarea id="qa-question" placeholder="E.g., How does photosynthesis work at the chemical level? or Explain the difference between pass-by-value and pass-by-reference in Java." rows="6" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Concept Explanation Fields -->
+                            <div class="form-view" id-view="explain">
+                                <div class="form-group">
+                                    <label for="explain-concept">Concept to explain</label>
+                                    <input type="text" id="explain-concept" placeholder="E.g., Quantum Entanglement, Huffman Coding, Blockchain, Inflation">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label for="explain-level">Target Complexity Level</label>
+                                        <select id="explain-level" class="custom-select">
+                                            <option value="Beginner">Beginner (Uses analogies & simple words)</option>
+                                            <option value="Intermediate" selected>Intermediate (Standard terminology & use cases)</option>
+                                            <option value="Advanced">Advanced (Deep mechanics & mathematical comparisons)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quiz Generator Fields -->
+                            <div class="form-view" id-view="quiz">
+                                <div class="form-group">
+                                    <label for="quiz-topic">Quiz Topic</label>
+                                    <input type="text" id="quiz-topic" placeholder="E.g., Python Lists and Tuples, World War II Battles, Human Muscular System">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label for="quiz-difficulty">Difficulty</label>
+                                        <select id="quiz-difficulty" class="custom-select">
+                                            <option value="Easy">Easy</option>
+                                            <option value="Medium" selected>Medium</option>
+                                            <option value="Hard">Hard</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quiz-count">Number of Questions</label>
+                                        <select id="quiz-count" class="custom-select">
+                                            <option value="3">3 Questions</option>
+                                            <option value="5" selected>5 Questions</option>
+                                            <option value="10">10 Questions</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Summarization Fields -->
+                            <div class="form-view" id-view="summarize">
+                                <div class="form-group">
+                                    <label for="summarize-text">Paste text to summarize</label>
+                                    <textarea id="summarize-text" placeholder="Paste your study notes, paragraphs, textbook chapters here (max 12k characters)..." rows="8"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="summarize-format">Summary Style</label>
+                                    <select id="summarize-format" class="custom-select">
+                                        <option value="Concise" selected>Concise (A dense, high-impact paragraph)</option>
+                                        <option value="Detailed">Detailed (Structured outline with secondary arguments)</option>
+                                        <option value="Bullet-point">Bullet-point (List of key takeaways & terms)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Study Roadmap Fields -->
+                            <div class="form-view" id-view="recommend">
+                                <div class="form-group">
+                                    <label for="recommend-topic">What subject/skill do you want to learn?</label>
+                                    <input type="text" id="recommend-topic" placeholder="E.g., Docker & Containers, Data Structures in C++, Microeconomics, Spanish Level A1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="recommend-goals">What are your specific learning goals?</label>
+                                    <textarea id="recommend-goals" placeholder="E.g., I want to build and deploy a multi-container app, or I want to understand time complexity and implement sorting algorithms from scratch." rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="recommend-level">Current Experience Level</label>
+                                    <select id="recommend-level" class="custom-select">
+                                        <option value="Beginner" selected>Complete Beginner</option>
+                                        <option value="Intermediate">Intermediate (Have some core background)</option>
+                                        <option value="Advanced">Advanced (Know the tools, want expert optimization)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="submit" id="submit-btn" class="btn primary-btn">
+                                <i data-lucide="sparkles"></i>
+                                <span>Generate Magic</span>
+                            </button>
+                            <button type="button" id="clear-btn" class="btn secondary-btn">
+                                <i data-lucide="rotate-ccw"></i>
+                                <span>Clear Inputs</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Loader Overlay (Hidden by Default) -->
+                <div class="loader-overlay hidden" id="loader">
+                    <div class="loader-content">
+                        <div class="spinner-portal">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                        </div>
+                        <h3>Genie is conjuring knowledge...</h3>
+                        <p class="loader-tip" id="loader-tip">Formulating responses based on educational standards...</p>
+                    </div>
+                </div>
+
+                <!-- Alert Message -->
+                <div class="alert hidden" id="alert-box">
+                    <i data-lucide="alert-triangle"></i>
+                    <span id="alert-message">Something went wrong!</span>
+                    <button class="close-alert-btn" id="close-alert-btn">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <!-- Output Panel (Hidden by Default) -->
+                <div class="glass-card output-panel-card hidden" id="output-panel">
+                    <div class="output-header">
+                        <div class="output-meta">
+                            <span class="engine-badge">
+                                <i data-lucide="cpu"></i>
+                                <span id="output-engine">Gemini 1.5 Pro</span>
+                            </span>
+                        </div>
+                        <div class="output-actions">
+                            <button class="icon-btn tooltip" id="copy-btn" data-tooltip="Copy to Clipboard">
+                                <i data-lucide="copy"></i>
+                            </button>
+                            <button class="icon-btn tooltip" id="clear-output-btn" data-tooltip="Dismiss Result">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="output-body" id="output-content">
+                        <!-- Content will be rendered dynamically by JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Script -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
