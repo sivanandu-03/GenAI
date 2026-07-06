@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // --- STORES AND STATES ---
-    let activeTab = "qa";
+    let activeTab = "dashboard";
     let lastGeneratedResponseText = ""; // Stored for copy commands
     let currentUser = null;
 
@@ -53,6 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Tab metadata dictionary
     const tabMeta = {
+        dashboard: {
+            title: "Dashboard Overview",
+            desc: "Welcome back to your educational command center."
+        },
         qa: {
             title: "Q&A Tutor",
             desc: "Submit academic questions to receive structured answers, step-by-step logic, and real-world examples."
@@ -87,8 +91,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Update workspace headings
             activeTab = selectedTab;
-            tabTitle.textContent = tabMeta[selectedTab].title;
-            tabDescription.textContent = tabMeta[selectedTab].desc;
+            
+            const dashboardView = document.getElementById("dashboard-view");
+            const inputPanel = document.querySelector(".input-panel");
+
+            if (selectedTab === "dashboard") {
+                tabTitle.textContent = "Dashboard Overview";
+                tabDescription.textContent = "Welcome back to your educational command center.";
+                if (dashboardView) dashboardView.classList.add("active");
+                if (inputPanel) inputPanel.classList.add("hidden");
+                if (outputPanel) outputPanel.classList.add("hidden");
+            } else {
+                tabTitle.textContent = tabMeta[selectedTab].title;
+                tabDescription.textContent = tabMeta[selectedTab].desc;
+                if (dashboardView) dashboardView.classList.remove("active");
+                if (inputPanel) inputPanel.classList.remove("hidden");
+                if (outputPanel) outputPanel.classList.add("hidden");
+            }
 
             // Toggle form views
             formViews.forEach(view => {
@@ -105,6 +124,55 @@ document.addEventListener("DOMContentLoaded", () => {
             // Re-initialize Lucide icons in text header updates if any
             if (window.lucide) {
                 window.lucide.createIcons();
+            }
+        });
+    });
+
+    // --- QUICK ACTION NAVIGATION LOGIC ---
+    document.querySelectorAll(".action-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTab = btn.getAttribute("data-action-tab");
+            const navBtn = document.querySelector(`.nav-item[data-tab="${targetTab}"]`);
+            if (navBtn) {
+                navBtn.click();
+            }
+        });
+    });
+
+    // --- RECOMMENDED TOPICS LOGIC ---
+    document.querySelectorAll(".topic-tag").forEach(tag => {
+        tag.addEventListener("click", () => {
+            const topic = tag.getAttribute("data-topic");
+            if (topic === "React Hooks") {
+                const qaBtn = document.querySelector('.nav-item[data-tab="qa"]');
+                if (qaBtn) {
+                    qaBtn.click();
+                    const input = document.getElementById("qa-question");
+                    if (input) {
+                        input.value = "Explain React Hooks and how they manage state, with code examples.";
+                        input.focus();
+                    }
+                }
+            } else if (topic === "SQL Optimization") {
+                const qaBtn = document.querySelector('.nav-item[data-tab="qa"]');
+                if (qaBtn) {
+                    qaBtn.click();
+                    const input = document.getElementById("qa-question");
+                    if (input) {
+                        input.value = "What are the best practices for SQL query optimization?";
+                        input.focus();
+                    }
+                }
+            } else {
+                const explainBtn = document.querySelector('.nav-item[data-tab="explain"]');
+                if (explainBtn) {
+                    explainBtn.click();
+                    const input = document.getElementById("explain-concept");
+                    if (input) {
+                        input.value = topic;
+                        input.focus();
+                    }
+                }
             }
         });
     });
@@ -131,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initialize required flags
-    toggleFormRequirements("qa");
+    toggleFormRequirements("dashboard");
 
     // --- LOADER EFFECTS ---
     function startLoaderTipCycle() {
@@ -187,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
         html = html.replace(/^\s*[-*]\s+(.*?)$/gm, "<li>$1</li>");
         // Combine consecutive li elements
         html = html.replace(/(<li>.*?<\/li>)+/g, "<ul>$&</ul>");
-        
+
         // Standard paragraphs by splitting double-newlines
         let segments = html.split(/\n\n+/);
         html = segments.map(seg => {
@@ -248,9 +316,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const roadmap = data.roadmap || [];
         const resources = data.resources || [];
         const suggestions = data.practice_suggestions || [];
-        
+
         let html = '<div class="output-text-block">';
-        
+
         // 1. Timeline layout
         html += `<h3><i data-lucide="map" style="display:inline-block; vertical-align:middle; margin-right:8px; width:20px; height:20px; color:var(--accent-secondary)"></i>Study Timeline</h3>`;
         html += '<div class="roadmap-timeline" style="margin-top: 1.5rem;">';
@@ -259,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="roadmap-phase-node ${idx === 0 ? 'active' : ''}">
                 <div class="roadmap-phase-card">
                     <div class="roadmap-phase-meta">
-                        <span>${step.phase || `Phase ${idx+1}`}</span>
+                        <span>${step.phase || `Phase ${idx + 1}`}</span>
                         <span><i data-lucide="clock" style="display:inline-block; vertical-align:middle; width:14px; height:14px; margin-right:4px;"></i>${step.duration || 'Flexible'}</span>
                     </div>
                     <div class="roadmap-phase-title">${step.title}</div>
@@ -310,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         hideAlert();
         outputPanel.classList.add("hidden");
-        
+
         const provider = modelSelect.value;
         let url = "";
         let bodyPayload = { model_preference: provider };
@@ -371,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (errText && errText.trim().length > 0 && errText.length < 200) {
                             errMsg = errText.trim();
                         }
-                    } catch (textErr) {}
+                    } catch (textErr) { }
                 }
                 throw new Error(errMsg);
             }
@@ -382,10 +450,10 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (jsonErr) {
                 throw new Error("Received an invalid response format from the server.");
             }
-            
+
             // Format and display response
             renderResponseData(data);
-            
+
         } catch (err) {
             loggerError(`API Failure on endpoint ${url}: ${err.message}`);
             showAlert(`Failed to retrieve data: ${err.message}. Please check your API key quota, settings, or try again.`);
@@ -431,7 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         outputContent.innerHTML = htmlString;
         outputPanel.classList.remove("hidden");
-        
+
         // Auto scroll to results
         outputPanel.scrollIntoView({ behavior: "smooth" });
 
@@ -447,7 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = e.target;
             const questionIdx = btn.getAttribute("data-question");
             const isCorrect = btn.getAttribute("data-correct") === "true";
-            
+
             const card = document.getElementById(`quiz-card-${questionIdx}`);
             const options = card.querySelectorAll(".quiz-option-btn");
             const explanationBox = document.getElementById(`quiz-expl-${questionIdx}`);
@@ -499,7 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             await navigator.clipboard.writeText(lastGeneratedResponseText);
-            
+
             // UI feedback toggle
             const originalTooltip = copyBtn.getAttribute("data-tooltip");
             copyBtn.setAttribute("data-tooltip", "Copied!");
@@ -549,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- AUTHENTICATION STATE ACTIONS ---
-    
+
     // Switch between Login and Signup tabs inside the modal
     tabLoginBtn.addEventListener("click", () => {
         tabSignupBtn.classList.remove("active");
@@ -581,22 +649,22 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         hideAuthAlert();
-        
+
         const email = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
-        
+
         try {
             const res = await fetch("/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
             });
-            
+
             if (!res.ok) {
                 const errData = await res.json();
                 throw new Error(errData.detail || "Authentication failed.");
             }
-            
+
             const data = await res.json();
             handleAuthSuccess(data);
         } catch (err) {
@@ -608,23 +676,23 @@ document.addEventListener("DOMContentLoaded", () => {
     signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         hideAuthAlert();
-        
+
         const username = document.getElementById("signup-username").value;
         const email = document.getElementById("signup-email").value;
         const password = document.getElementById("signup-password").value;
-        
+
         try {
             const res = await fetch("/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, email, password })
             });
-            
+
             if (!res.ok) {
                 const errData = await res.json();
                 throw new Error(errData.detail || "Registration failed.");
             }
-            
+
             const data = await res.json();
             handleAuthSuccess(data);
         } catch (err) {
@@ -636,20 +704,20 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleAuthSuccess(data) {
         localStorage.setItem("token", data.access_token);
         currentUser = data.user;
-        
+
         // Populate profile card details
         profileUsername.textContent = currentUser.username;
         profileEmail.textContent = currentUser.email;
         profileAvatar.textContent = currentUser.username.charAt(0);
-        
+
         // Show profile card and hide auth modal
         userProfileCard.classList.remove("hidden");
         authModal.classList.add("hidden");
-        
+
         // Reset forms
         loginForm.reset();
         signupForm.reset();
-        
+
         // Recompile Lucide icons for new profile buttons
         if (window.lucide) {
             window.lucide.createIcons();
@@ -660,7 +728,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("token");
         currentUser = null;
-        
+
         // Hide profile card and show auth modal
         userProfileCard.classList.add("hidden");
         authModal.classList.remove("hidden");
@@ -673,24 +741,25 @@ document.addEventListener("DOMContentLoaded", () => {
             authModal.classList.remove("hidden");
             return;
         }
-        
+
         try {
             const res = await fetch("/auth/me", {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
             });
-            
+
             if (res.ok) {
                 const user = await res.json();
                 currentUser = user;
-                
+
                 // Populate profile card
                 profileUsername.textContent = user.username;
                 profileEmail.textContent = user.email;
                 profileAvatar.textContent = user.username.charAt(0);
+
                 userProfileCard.classList.remove("hidden");
                 authModal.classList.add("hidden");
-                
+
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
@@ -702,124 +771,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             // Network failure: fallback to showing modal but don't delete local token yet
             authModal.classList.remove("hidden");
-        } finally {
-            // Initialize premium custom dropdowns after session load completes
-            initializeCustomDropdowns();
-        }
-    }
-
-    // --- CUSTOM SELECT DROPDOWN WRAPPER ENGINE ---
-    function initializeCustomDropdowns() {
-        const nativeSelects = document.querySelectorAll("select");
-        
-        nativeSelects.forEach(select => {
-            // Avoid duplicate custom dropdown conversions
-            if (select.nextElementSibling && select.nextElementSibling.classList.contains("custom-dropdown-container")) {
-                return;
-            }
-            
-            // Create container
-            const container = document.createElement("div");
-            container.className = "custom-dropdown-container";
-            
-            // Create trigger
-            const trigger = document.createElement("div");
-            trigger.className = "custom-dropdown-trigger";
-            
-            const selectedOption = select.options[select.selectedIndex] || select.options[0];
-            const triggerText = document.createElement("span");
-            triggerText.textContent = selectedOption ? selectedOption.text : "Select option...";
-            trigger.appendChild(triggerText);
-            
-            const chevron = document.createElement("i");
-            chevron.setAttribute("data-lucide", "chevron-down");
-            trigger.appendChild(chevron);
-            
-            // Create options panel
-            const optionsPanel = document.createElement("div");
-            optionsPanel.className = "custom-dropdown-options";
-            
-            // Populate option items
-            Array.from(select.options).forEach(opt => {
-                const item = document.createElement("div");
-                item.className = "custom-dropdown-option";
-                if (opt.value === select.value) {
-                    item.classList.add("selected");
-                }
-                item.textContent = opt.text;
-                item.setAttribute("data-value", opt.value);
-                
-                item.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    
-                    // Update native select
-                    select.value = opt.value;
-                    select.dispatchEvent(new Event("change"));
-                    
-                    // Update custom triggers and select indicators
-                    triggerText.textContent = opt.text;
-                    optionsPanel.querySelectorAll(".custom-dropdown-option").forEach(child => {
-                        child.classList.remove("selected");
-                    });
-                    item.classList.add("selected");
-                    
-                    // Close list
-                    container.classList.remove("open");
-                });
-                
-                optionsPanel.appendChild(item);
-            });
-            
-            // Toggle dropdown toggle triggers
-            trigger.addEventListener("click", (e) => {
-                e.stopPropagation();
-                
-                // Close other custom dropdowns
-                document.querySelectorAll(".custom-dropdown-container").forEach(c => {
-                    if (c !== container) c.classList.remove("open");
-                });
-                
-                container.classList.toggle("open");
-            });
-            
-            // Assemble elements
-            container.appendChild(trigger);
-            container.appendChild(optionsPanel);
-            
-            // Hide native element and insert container wrapper
-            select.style.display = "none";
-            select.parentNode.insertBefore(container, select.nextSibling);
-            
-            // Listen for native selection modifications (to sync visual options back)
-            select.addEventListener("change", () => {
-                const updatedOption = select.options[select.selectedIndex];
-                if (updatedOption) {
-                    triggerText.textContent = updatedOption.text;
-                    optionsPanel.querySelectorAll(".custom-dropdown-option").forEach(child => {
-                        if (child.getAttribute("data-value") === select.value) {
-                            child.classList.add("selected");
-                        } else {
-                            child.classList.remove("selected");
-                        }
-                    });
-                }
-            });
-        });
-        
-        // Globally close custom dropdown selections if client clicks elsewhere
-        document.addEventListener("click", () => {
-            document.querySelectorAll(".custom-dropdown-container").forEach(c => {
-                c.classList.remove("open");
-            });
-        });
-        
-        // Redraw Lucide icons inside custom dropdown triggers
-        if (window.lucide) {
-            window.lucide.createIcons();
         }
     }
 
     // Trigger session loading check
     loadActiveSession();
 });
-

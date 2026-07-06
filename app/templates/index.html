@@ -26,7 +26,11 @@
             </div>
             
             <nav class="nav-menu">
-                <button class="nav-item active" data-tab="qa">
+                <button class="nav-item active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="qa">
                     <i data-lucide="help-circle"></i>
                     <span>Q&A Tutor</span>
                 </button>
@@ -94,14 +98,168 @@
         <main class="main-content">
             <header class="workspace-header">
                 <div class="welcome-banner">
-                    <h2 id="tab-title">Q&A Tutor</h2>
-                    <p id="tab-description">Ask any educational question and receive deep, explanatory responses with real-world examples.</p>
+                    <h2 id="tab-title">Dashboard Overview</h2>
+                    <p id="tab-description">Welcome back to your educational command center.</p>
                 </div>
             </header>
 
             <section class="workspace-body">
+                <!-- SaaS Dashboard View -->
+                <div class="dashboard-view active" id="dashboard-view">
+                    <!-- Row 1: Welcome Hero Card -->
+                    <div class="hero-card">
+                        <div class="hero-content">
+                            <span class="hero-badge">🚀 Platform Active</span>
+                            <h2>Accelerate Your Learning with EduGenie</h2>
+                            <p>EduGenie leverages enterprise-grade generative AI models to explain concepts, build practice quizzes, structure study roadmaps, and summarize complex research papers.</p>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-box">
+                                <span class="stat-value">7 days</span>
+                                <span class="stat-label"><i data-lucide="zap"></i> Study Streak</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value">98%</span>
+                                <span class="stat-label"><i data-lucide="activity"></i> Progress Rate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Grid for Progress, streak, stats -->
+                    <div class="dashboard-grid grid-3">
+                        <!-- Stats Card -->
+                        <div class="card stats-card">
+                            <h3>Usage Statistics</h3>
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <span class="label">Tokens Consumed</span>
+                                    <span class="val">14,248</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Queries Resolved</span>
+                                    <span class="val">48</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Quizzes Completed</span>
+                                    <span class="val">12</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Card -->
+                        <div class="card progress-card">
+                            <h3>Learning Progress</h3>
+                            <div class="progress-details">
+                                <div class="progress-info">
+                                    <span>Core Curriculum</span>
+                                    <span>84%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" style="width: 84%"></div>
+                                </div>
+                                <div class="progress-info" style="margin-top: 1rem;">
+                                    <span>AI Tutor Engagement</span>
+                                    <span>92%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Streak Card -->
+                        <div class="card streak-card">
+                            <h3>Study Streak</h3>
+                            <div class="streak-body">
+                                <div class="streak-badge">
+                                    <i data-lucide="flame"></i>
+                                    <span>7 Day Streak</span>
+                                </div>
+                                <p class="streak-note">Keep it up! You've logged study activities every day this week.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Grid for Quick Actions, Recent items -->
+                    <div class="dashboard-grid grid-2">
+                        <!-- Quick Actions Card -->
+                        <div class="card quick-actions-card">
+                            <h3>AI Assistant Quick Actions</h3>
+                            <div class="actions-grid">
+                                <button class="action-btn" data-action-tab="qa">
+                                    <i data-lucide="help-circle"></i>
+                                    <div class="btn-info">
+                                        <h4>Q&A Tutor</h4>
+                                        <span>Ask academic questions</span>
+                                    </div>
+                                </button>
+                                <button class="action-btn" data-action-tab="explain">
+                                    <i data-lucide="book-open"></i>
+                                    <div class="btn-info">
+                                        <h4>Explain Concepts</h4>
+                                        <span>Simplify complex topics</span>
+                                    </div>
+                                </button>
+                                <button class="action-btn" data-action-tab="quiz">
+                                    <i data-lucide="check-square"></i>
+                                    <div class="btn-info">
+                                        <h4>Generate Quiz</h4>
+                                        <span>Test your knowledge</span>
+                                    </div>
+                                </button>
+                                <button class="action-btn" data-action-tab="summarize">
+                                    <i data-lucide="file-text"></i>
+                                    <div class="btn-info">
+                                        <h4>Summarize Notes</h4>
+                                        <span>Distill study assets</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Conversations & Notes Card -->
+                        <div class="card recent-activity-card">
+                            <h3>Recent Activity & Notes</h3>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i data-lucide="message-square"></i></div>
+                                    <div class="activity-details">
+                                        <span class="title">Photosynthesis Concept Explanation</span>
+                                        <span class="meta">Completed 2 hours ago • Intermediate Level</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i data-lucide="check-square"></i></div>
+                                    <div class="activity-details">
+                                        <span class="title">Data Structures & Arrays Practice Quiz</span>
+                                        <span class="meta">Scored 4/5 • Completed yesterday</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i data-lucide="compass"></i></div>
+                                    <div class="activity-details">
+                                        <span class="title">Docker & Microservices Study Roadmap</span>
+                                        <span class="meta">Created 3 days ago • Beginner Level</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Recommended Topics -->
+                    <div class="card recommendations-card">
+                        <h3>Recommended Learning Topics</h3>
+                        <div class="topics-container">
+                            <span class="topic-tag" data-topic="React Hooks"><i data-lucide="hash"></i> React Hooks</span>
+                            <span class="topic-tag" data-topic="Machine Learning Basics"><i data-lucide="hash"></i> Machine Learning</span>
+                            <span class="topic-tag" data-topic="Git Rebase Workflow"><i data-lucide="hash"></i> Git Workflows</span>
+                            <span class="topic-tag" data-topic="SQL Optimization"><i data-lucide="hash"></i> database Performance</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Input Panel -->
-                <div class="glass-card input-panel">
+                <div class="glass-card input-panel hidden">
                     <form id="assistant-form">
                         <!-- Dynamic inputs container -->
                         <div id="dynamic-inputs">
