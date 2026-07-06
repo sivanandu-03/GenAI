@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import RecommendRequest, RecommendResponse, RoadmapStep, ResourceItem
 from app.services.education_service import education_service
 from app.utils.validators import validate_max_length, sanitize_text
 from app.utils.logger import logger
+from app.utils.auth_helper import get_current_user
 
 router = APIRouter(prefix="/recommend", tags=["Personalized Learning Recommendations"])
 
 @router.post("", response_model=RecommendResponse)
-async def post_recommend(payload: RecommendRequest):
+async def post_recommend(payload: RecommendRequest, current_user: dict = Depends(get_current_user)):
     """
     Generates a personalized study roadmap, lists resources, and practice suggestions
     based on a student's current skill level, topic, and goals.

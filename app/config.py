@@ -35,6 +35,15 @@ class Settings:
     # HF cache directory path to prevent dumping in user home
     HF_CACHE_DIR: Path = BASE_DIR / ".cache" / "huggingface"
 
+    # MongoDB Settings
+    MONGODB_URL: str = os.getenv("MONGODB_URL", "")
+    MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "edugenie")
+
+    # JWT Settings
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "super_secret_pedagogical_genie_key_2026_change_me")
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+
+
     def is_gemini_configured(self) -> bool:
         """Check if Gemini API Key is loaded."""
         return bool(self.GEMINI_API_KEY and self.GEMINI_API_KEY != "your_gemini_api_key_here")

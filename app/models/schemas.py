@@ -130,3 +130,36 @@ class RecommendResponse(BaseModel):
     resources: List[ResourceItem]
     practice_suggestions: List[str]
     model_used: str
+
+# --- Authentication Models ---
+class UserSignupRequest(BaseModel):
+    email: str = Field(..., description="User's email address.")
+    username: str = Field(..., min_length=3, max_length=50, description="User's unique username.")
+    password: str = Field(..., min_length=6, description="User's password (min 6 characters).")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if "@" not in v:
+            raise ValueError("Invalid email format.")
+        return v
+
+class UserLoginRequest(BaseModel):
+    email: str = Field(..., description="User's email address.")
+    password: str = Field(..., description="User's password.")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        return v.strip().lower()
+
+class UserResponse(BaseModel):
+    email: str
+    username: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse
+

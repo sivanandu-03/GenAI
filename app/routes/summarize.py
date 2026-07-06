@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import SummarizeRequest, SummarizeResponse
 from app.services.education_service import education_service
 from app.utils.validators import validate_max_length, sanitize_text
 from app.utils.logger import logger
+from app.utils.auth_helper import get_current_user
 
 router = APIRouter(prefix="/summarize", tags=["Educational Summarization"])
 
 @router.post("", response_model=SummarizeResponse)
-async def post_summarize(payload: SummarizeRequest):
+async def post_summarize(payload: SummarizeRequest, current_user: dict = Depends(get_current_user)):
     """
     Summarizes notes, chapters, or paragraphs into Concise, Detailed, or Bullet-point formats.
     """

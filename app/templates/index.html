@@ -67,6 +67,20 @@
                 </div>
             </div>
 
+            <!-- User Profile Card -->
+            <div class="profile-card hidden" id="user-profile-card">
+                <div class="profile-info">
+                    <div class="profile-avatar" id="profile-avatar">U</div>
+                    <div class="profile-details">
+                        <div class="profile-username" id="profile-username">Username</div>
+                        <div class="profile-email" id="profile-email">email@domain.com</div>
+                    </div>
+                </div>
+                <button type="button" class="logout-btn" id="logout-btn" title="Log Out">
+                    <i data-lucide="log-out"></i>
+                </button>
+            </div>
+
             <!-- Footer status -->
             <div class="sidebar-footer">
                 <div class="status-indicator">
@@ -240,6 +254,87 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Glassmorphic Auth Modal Overlay -->
+    <div id="auth-modal" class="auth-modal-overlay">
+        <div class="glass-card auth-card animate-fade-in">
+            <div class="brand auth-brand">
+                <div class="logo-container">
+                    <span class="magic-wand">🔮</span>
+                    <h1>EduGenie</h1>
+                </div>
+                <p class="tagline">Your Personal AI Tutor</p>
+            </div>
+            
+            <!-- Auth Tab Switcher -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="tab-login-btn">
+                    <i data-lucide="log-in"></i>
+                    <span>Login</span>
+                </button>
+                <button type="button" class="auth-tab-btn" id="tab-signup-btn">
+                    <i data-lucide="user-plus"></i>
+                    <span>Sign Up</span>
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="login-email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn auth-submit-btn">
+                    <i data-lucide="sparkles"></i>
+                    <span>Access Dashboard</span>
+                </button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="signup-username" placeholder="Choose a username" required minlength="3" maxlength="30">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="signup-email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="signup-password" placeholder="Minimum 6 characters" required minlength="6">
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn auth-submit-btn">
+                    <i data-lucide="sparkles"></i>
+                    <span>Create Free Account</span>
+                </button>
+            </form>
+            
+            <div id="auth-alert" class="alert auth-alert hidden">
+                <i data-lucide="alert-triangle"></i>
+                <span id="auth-alert-message"></span>
+            </div>
+        </div>
     </div>
 
     <!-- Application Script -->

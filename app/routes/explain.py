@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import ExplainRequest, ExplainResponse
 from app.services.education_service import education_service
 from app.utils.validators import validate_max_length, sanitize_text
 from app.utils.logger import logger
+from app.utils.auth_helper import get_current_user
 
 router = APIRouter(prefix="/explain", tags=["Concept Explanation"])
 
 @router.post("", response_model=ExplainResponse)
-async def post_explain(payload: ExplainRequest):
+async def post_explain(payload: ExplainRequest, current_user: dict = Depends(get_current_user)):
     """
     Requests a pedagogical explanation of a concept.
     Accommodates beginner, intermediate, and advanced comprehension levels.

@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import QARequest, QAResponse
 from app.services.education_service import education_service
 from app.utils.validators import validate_max_length, sanitize_text
 from app.utils.logger import logger
+from app.utils.auth_helper import get_current_user
 
 router = APIRouter(prefix="/qa", tags=["Educational QA"])
 
 @router.post("", response_model=QAResponse)
-async def post_qa(payload: QARequest):
+async def post_qa(payload: QARequest, current_user: dict = Depends(get_current_user)):
     """
     Submits an educational question and returns a detailed answer.
     Routes to Gemini or LaMini as preferred.

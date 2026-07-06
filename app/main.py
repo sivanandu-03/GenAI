@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -5,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from app.config import settings
 from app.utils.logger import logger
+from app.utils.db import connect_to_mongo, close_mongo_connection
 
 # Import endpoints
 from app.routes.qa import router as qa_router
@@ -12,6 +14,14 @@ from app.routes.explain import router as explain_router
 from app.routes.quiz import router as quiz_router
 from app.routes.summarize import router as summarize_router
 from app.routes.recommend import router as recommend_router
+from app.routes.auth import router as auth_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manages application-wide database connection startup and cleanup events."""
+    await connect_to_mongo()
+    yield
+    await close_mongo_connection()
 
 # Initialize FastAPI App
 app = FastAPI(
@@ -20,6 +30,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
+    lifespan=lifespan,
 )
 
 # Set up CORS policies
@@ -42,6 +53,7 @@ app.mount("/static", StaticFiles(directory=str(settings.STATIC_PATH)), name="sta
 templates = Jinja2Templates(directory=str(settings.TEMPLATES_PATH))
 
 # Mount Routers
+app.include_router(auth_router)
 app.include_router(qa_router)
 app.include_router(explain_router)
 app.include_router(quiz_router)

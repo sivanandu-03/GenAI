@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import QuizRequest, QuizResponse, QuestionItem
 from app.services.education_service import education_service
 from app.utils.validators import validate_max_length, sanitize_text
 from app.utils.logger import logger
+from app.utils.auth_helper import get_current_user
 
 router = APIRouter(prefix="/quiz", tags=["Quiz Generation"])
 
 @router.post("", response_model=QuizResponse)
-async def post_quiz(payload: QuizRequest):
+async def post_quiz(payload: QuizRequest, current_user: dict = Depends(get_current_user)):
     """
     Generates a structured, multiple-choice quiz about a specific topic.
     Difficulty options: Easy, Medium, Hard. Question range: 1 to 10.

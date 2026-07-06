@@ -29,9 +29,20 @@ class TestEduGenieEndpoints(unittest.TestCase):
         self.mock_gemini.return_value = "This is a mock response from Gemini API."
         self.mock_lamini.return_value = "This is a mock response from local LaMini."
 
+        # Mock authentication dependency
+        from app.utils.auth_helper import get_current_user
+        async def mock_get_current_user():
+            return {"email": "test@example.com", "username": "testuser"}
+        app.dependency_overrides[get_current_user] = mock_get_current_user
+
     def tearDown(self):
         self.gemini_patcher.stop()
         self.lamini_patcher.stop()
+        
+        # Clear dependency overrides
+        from app.utils.auth_helper import get_current_user
+        if get_current_user in app.dependency_overrides:
+            del app.dependency_overrides[get_current_user]
 
     def test_health_endpoint(self):
         """Verifies health check endpoints return 200 and connectivity statuses."""
@@ -150,6 +161,103 @@ class TestEduGenieEndpoints(unittest.TestCase):
         self.assertEqual(data["roadmap"][0]["title"], "Learn HTML")
         self.assertEqual(len(data["resources"]), 1)
         self.assertEqual(data["practice_suggestions"][0], "Build a home page layout")
+
+class TestEduGenieAuthEndpoints(unittest.TestCase):
+    """
+    Test suite verifying authentication endpoints.
+    Mocks MongoDB calls using unittest.mock.AsyncMock.
+    """
+
+    def setUp(self):
+        # Patch database instance inside auth routes
+        self.db_patcher = patch("app.routes.auth.db_instance")
+        self.mock_db_instance = self.db_patcher.start()
+        self.mock_db = MagicMock()
+        self.mock_db_instance.db = self.mock_db
+        
+        # Mock users collection
+        self.mock_users = MagicMock()
+        self.mock_db.__getitem__.return_value = self.mock_users
+        
+        from unittest.mock import AsyncMock
+        self.mock_users.find_one = AsyncMock()
+        self.mock_users.insert_one = AsyncMock()
+
+    def tearDown(self):
+        self.db_patcher.stop()
+
+    def test_signup_success(self):
+        """Verifies new user registration adds credentials to MongoDB and returns access token."""
+        self.mock_users.find_one.return_value = None  # User doesn't exist yet
+        
+        payload = {
+            "email": "newstudent@example.com",
+            "username": "newstudent",
+            "password": "securepassword123"
+        }
+        response = client.post("/auth/signup", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("access_token", data)
+        self.assertEqual(data["token_type"], "bearer")
+        self.assertEqual(data["user"]["email"], "newstudent@example.com")
+        self.assertEqual(data["user"]["username"], "newstudent")
+        
+        # Check database collection actions
+        self.mock_users.find_one.assert_any_call({"email": "newstudent@example.com"})
+        self.mock_users.find_one.assert_any_call({"username": "newstudent"})
+        self.mock_users.insert_one.assert_called_once()
+
+    def test_signup_existing_email(self):
+        """Verifies signup rejection if the email is already registered."""
+        self.mock_users.find_one.return_value = {"email": "exists@example.com"}
+        
+        payload = {
+            "email": "exists@example.com",
+            "username": "newstudent",
+            "password": "securepassword123"
+        }
+        response = client.post("/auth/signup", json=payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("already exists", response.json()["detail"])
+
+    def test_login_success(self):
+        """Verifies login authenticity and returns access token on correct credentials."""
+        from app.utils.auth_helper import hash_password
+        hashed = hash_password("secretpass")
+        self.mock_users.find_one.return_value = {
+            "email": "student@example.com",
+            "username": "student",
+            "password": hashed
+        }
+        
+        payload = {
+            "email": "student@example.com",
+            "password": "secretpass"
+        }
+        response = client.post("/auth/login", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("access_token", data)
+        self.assertEqual(data["user"]["username"], "student")
+
+    def test_login_invalid_password(self):
+        """Verifies login rejection on wrong passwords."""
+        from app.utils.auth_helper import hash_password
+        hashed = hash_password("secretpass")
+        self.mock_users.find_one.return_value = {
+            "email": "student@example.com",
+            "username": "student",
+            "password": hashed
+        }
+        
+        payload = {
+            "email": "student@example.com",
+            "password": "wrongpassword"
+        }
+        response = client.post("/auth/login", json=payload)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Invalid email or password", response.json()["detail"])
 
 if __name__ == "__main__":
     unittest.main()
